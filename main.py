@@ -12,43 +12,46 @@ import numpy
 
 dataset = numpy.loadtxt("./input/HCV-Egy-Data.csv", delimiter=",")
 
-X = dataset[:600, 0:27]
-Y = dataset[:600, 27:29]
+training_data_count = 600
+testing_data_count = 100
+girdi_sayisi=27
+cikti_sayisi=1
+
+X = dataset[:training_data_count, 0:girdi_sayisi]
+Y = dataset[:training_data_count, girdi_sayisi+cikti_sayisi]
 print(X)
 print(Y)
 
 model = Sequential()
 
-model.add(Dense(20, input_dim=27, init='uniform', activation='relu'))
-# İkinci katmanımızda 12 yapay sinir hücresi.
-model.add(Dense(12, init='uniform', activation='relu'))
+model.add(Dense(14, input_dim=girdi_sayisi, init='uniform', activation='relu'))
 
-# Üçüncü katmanımızda 8 yapay hücremiz var.
-model.add(Dense(8, init='uniform', activation='sigmoid'))
 
-# Dördüncü katmanımızda 2 yapay hücremiz var. Yani çıkışımız.
-model.add(Dense(2, init='uniform', activation='sigmoid'))
+model.add(Dense(14, init='uniform', activation='relu'))
+
+# Dördüncü katmanımızda 1 yapay hücremiz var. Yani çıkışımız.
+model.add(Dense(1, init='uniform', activation='sigmoid'))
 
 # Modelimizi derliyoruz.
-model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
 
-model.fit(X, Y, nb_epoch=150, batch_size=10, verbose=2)
+model.fit(X, Y, validation_split=0.2, epochs=150, verbose=2)
 
 scores = model.evaluate(X, Y)
 
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
 # 96 adet test verimizin sadece 27 girdisini sisteme veriyoruz.
-test_verisi = dataset[600:696, 0:27]
+test_verisi = dataset[training_data_count:training_data_count+testing_data_count, 0:girdi_sayisi]
 
-# Sistemin verdiğimiz değerlerden yola çıkarak kişinin diyabet hastası olup olmadığını tahmin ediyor.
+# Sistemin verdiğimiz değerlerden yola çıkarak kişinin hepatit c hastası olup olmadığını tahmin ediyor.
 predictions = model.predict(test_verisi)
 
 dogru = 0
 yanlis = 0
-toplam_veri = len(dataset[600:696, 27])
+toplam_veri = len(dataset[training_data_count:training_data_count+testing_data_count, girdi_sayisi])
 
-for x, y in zip(predictions, dataset[600:696, 27]):
+for x, y in zip(predictions, dataset[training_data_count:training_data_count+testing_data_count, girdi_sayisi+cikti_sayisi]):
     x = int(numpy.round(x[0]))
     if int(x) == y:
         cprint("Tahmin: " + str(x) + " - Gerçek Değer: " + str(int(y)), "white", "on_green", attrs=['bold'])
