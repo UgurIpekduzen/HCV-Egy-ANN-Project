@@ -12,25 +12,22 @@ import numpy
 
 dataset = numpy.loadtxt("./input/HCV-Egy-Data.csv", delimiter=",")
 
-training_data_count = 600
-testing_data_count = 100
+training_data_count = 100
+testing_data_count = 25
 girdi_sayisi=27
 cikti_sayisi=1
 
 X = dataset[:training_data_count, 0:girdi_sayisi]
 Y = dataset[:training_data_count, girdi_sayisi+cikti_sayisi]
-print(X)
-print(Y)
 
 model = Sequential()
 
-model.add(Dense(14, input_dim=girdi_sayisi, init='uniform', activation='relu'))
+model.add(Dense(14, input_dim=girdi_sayisi, activation='relu'))
 
-
-model.add(Dense(14, init='uniform', activation='relu'))
+model.add(Dense(14, activation='softmax'))
 
 # Dördüncü katmanımızda 1 yapay hücremiz var. Yani çıkışımız.
-model.add(Dense(1, init='uniform', activation='sigmoid'))
+model.add(Dense(1, activation='sigmoid'))
 
 # Modelimizi derliyoruz.
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
