@@ -1,49 +1,37 @@
-import numpy as np # linear algebra
-from pandas import *
-import matplotlib.pyplot as plt #data visualization
-import seaborn as sns #data visualization
+# Kullanacağımız ysa modeli için.
+from keras.models import Sequential
+
+# YSA modelimizde katmanlar oluşturabilmek için.
+from keras.layers import Dense
+from keras.optimizers import SGD
+# Çıktımızı terminalden aldığımızda sonuçları renklendiriyoruz. Yanlışlar kırmızı, doğrular yeşil. Bunu kullanmasanızda olur yani.
+from termcolor import cprint
+
+# YSA matrislerle çalıştığı için numpy olmazsa olmaz.
+import numpy as np
+
 import os
-#plotly library
-import plotly.plotly as py
-from plotly.offline import init_notebook_mode
-# init_notebook_mode(connected=True)
-import plotly.graph_objs as go
-
-# Input data files are available in the "../input/" directory.
-# For example, running this (by clicking run or pressing Shift+Enter) will list the files in the input directory
-
-
-# print(os.listdir("./input"))
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+dataset = np.loadtxt("./input/HCV-Egy-Data.csv", delimiter=",")
 
 
 
+X = dataset[:,0:28]
+Y = dataset[:, 28:29]
+print(X.shape)
+print(Y.shape)
 
-#
-# # column(feature) names in data
-# print(data.columns)
-# #
-# # getting an overview of our data
-# print(data.info())
-#
-# # checking for missing values
-# print("Are there missing values? {}".format(data.isnull().any().any()))
-# # missing value control in features
-# print(data.isnull().sum())
-#
-# #Let's learn about the int values in our dataset.
-# print(data.describe()) #include ID feature
-# #we don't need istaticsal summary for ID feature
-# print(data.iloc[:,1:].describe())
-#
-# print(data.head())
-#
-# #we found out how many teams in our data
-# print("Team Names in Dataset:")
-# print(data.Team.unique())
-#
-# print("\nYears in Dataset:")
-# #we sorted the years  for a better look view.
-# print(np.sort(data.Year.unique()))
-#
-# print("\nSport Types:")
-# print(data.Sport.unique())
+model = Sequential()
+
+model.add(Dense(400, input_dim=28, activation='relu'))
+# İkinci katmanımızda 12 yapay sinir hücresi.
+model.add(Dense(1, activation='sigmoid'))
+
+# Modelimizi derliyoruz.
+sgd = SGD(lr=0.9, decay=1e-6, momentum=1, nesterov=False)
+model.compile(loss='mean_squared_error', optimizer=sgd, metrics=['accuracy'])
+
+model.fit(X, Y, epochs=50, validation_split=0.13)
+
+tahmin = np.array([39,2,29,1,2,1,2,1,1,2,7136,4625248.00,10,211363.00,70,102,76.00,58,111,95,58,25,993940,992652,96482,334897,762760,15]).reshape(1,28)
+print(model.predict(tahmin))
