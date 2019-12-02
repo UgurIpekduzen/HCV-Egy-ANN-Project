@@ -13,9 +13,9 @@ xTrain, xTest, yTrain, yTest = train_test_split(X, Y, test_size= 0.2, random_sta
 
 model = Sequential()
 
-model.add(Dense(14, activation="relu", input_dim=27))
-model.add(Dense(20, activation="softmax"))
-model.add(Dense(1, activation="sigmoid"))
+model.add(Dense(16, activation="relu", input_dim=27))
+model.add(Dense(34, activation="softmax"))
+model.add(Dense(5, activation="sigmoid"))
 
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
 
