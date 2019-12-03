@@ -12,7 +12,7 @@ Y = dataset[:1385, 28]
 xTrain, xTest, yTrain, yTest = train_test_split(X, Y, test_size=0.2, random_state=0)
 
 targetClassified = np.zeros(shape=(yTrain.shape[0], 5))
-print(yTrain.shape)
+
 for i in range(yTrain.shape[0]):
     if yTrain[i] == 0:
         targetClassified[i] = np.array([1, 0, 0, 0, 0])
@@ -33,12 +33,17 @@ model.add(Dense(5, activation="sigmoid"))
 
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
 
-model.fit(xTrain, targetClassified, batch_size=64, shuffle=True, verbose=2, epochs=5)
+model.fit(xTrain, targetClassified, batch_size=64, shuffle=True, verbose=1, epochs=150)
 
-test_verisi = dataset[len(xTrain): 1385, 0:27]
-
-predictions = model.predict(test_verisi)
-
+predictions = model.predict(xTest)
+print(targetClassified[0])
+print(predictions[0])
+print(targetClassified[1])
+print(predictions[1])
+print(targetClassified[2])
+print(predictions[2])
+print(targetClassified[3])
+print(predictions[3])
 predictionResults = np.zeros(shape=(predictions.shape[0], 1))
 for i in range(predictions.shape[0]):
     if np.array_equal(predictions[i], np.array([1, 0, 0, 0, 0])):
@@ -56,9 +61,9 @@ for i in range(predictions.shape[0]):
 
 dogru = 0
 yanlis = 0
-toplam_veri = len(dataset[len(xTrain):1385, 27])
+toplam_veri = len(yTest)
 
-for x, y in zip(predictionResults, dataset[len(xTrain):1385, 28]):
+for x, y in zip(predictionResults, yTest):
     x = int(np.round(x[0]))
     if int(x) == y:
         cprint("Tahmin: " + str(x) + " - Gerçek Değer: " + str(int(y)), "white", "on_green", attrs=['bold'])
