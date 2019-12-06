@@ -4,25 +4,22 @@ from termcolor import cprint
 from sklearn.model_selection import train_test_split
 import numpy
 
-dataset = numpy.loadtxt("./input/test.csv", delimiter=",")
+dataset = numpy.loadtxt("./input/iris.csv", delimiter=",")
 
-X = dataset[:1385, 0:27]
-Y = dataset[:1385, 28]
+X = dataset[:len(dataset), 0:4]
+Y = dataset[:len(dataset), 4]
 
 xTrain, xTest, yTrain, yTest = train_test_split(X, Y, test_size=0.3, random_state=0)
-xValidation = xTrain[150:250]
-yValidation = yTrain[150:250]
-xTest = xValidation;
-yTest = yValidation
-
-model = Sequential()
-
-model.add(Dense(14, activation="relu", input_dim=27))
-model.add(Dense(1))
+xTest = xTrain
+yTest = yTrain
+model = Sequential([
+    Dense(3, activation="tanh", input_dim=4),
+    Dense(1, activation="sigmoid")
+])
 
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
 
-model.fit(xTrain, yTrain, validation_data=(xTest, yTest), batch_size=32, shuffle=True, verbose=0, epochs=100)
+model.fit(xTrain, yTrain, batch_size=32, shuffle=True, verbose=0, epochs=50)
 
 scores = model.evaluate(X, Y)
 

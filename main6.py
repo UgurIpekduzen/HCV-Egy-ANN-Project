@@ -1,30 +1,32 @@
 from keras.models import Sequential
 from keras.layers import Dense
 from termcolor import cprint
-from sklearn.model_selection import train_test_split
 import numpy
 
-dataset = numpy.loadtxt("./input/test.csv", delimiter=",")
+trainDataset = numpy.loadtxt("./input/HCV-Egy-Data-ANN-Train.csv", delimiter=",")
+testDataset = numpy.loadtxt("./input/HCV-Egy-Data-ANN-Test.csv", delimiter=",")
 
-X = dataset[:1385, 0:27]
-Y = dataset[:1385, 28]
+numpy.random.shuffle(trainDataset)
+xTrain = trainDataset[:len(trainDataset), 0:28]
+yTrain = trainDataset[:len(trainDataset), 28]
 
-xTrain, xTest, yTrain, yTest = train_test_split(X, Y, test_size=0.3, random_state=0)
-xValidation = xTrain[150:250]
-yValidation = yTrain[150:250]
-xTest = xValidation;
-yTest = yValidation
+xValidation = trainDataset[100:200, 0:28]
+yValidation = trainDataset[100:200, 28]
+
+xTest = testDataset[:len(testDataset), 0:28]
+yTest = testDataset[:len(testDataset), 28]
 
 model = Sequential()
 
-model.add(Dense(14, activation="relu", input_dim=27))
-model.add(Dense(1))
+model.add(Dense(6, activation="relu", input_dim=28))
+model.add(Dense(1,activation="softmax"))
 
 model.compile(loss='mean_absolute_error', optimizer='adam', metrics=['accuracy'])
 
-model.fit(xTrain, yTrain, validation_data=(xTest, yTest), batch_size=32, shuffle=True, verbose=0, epochs=100)
+model.fit(xTrain, yTrain, validation_data=(xValidation, yValidation), batch_size=32, shuffle=True, verbose=0, epochs=50)
 
-scores = model.evaluate(X, Y)
+scores = model.evaluate(xTrain, yTrain)
+print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
 predictions = model.predict(xTest)
 print(predictions[0])
