@@ -41,7 +41,7 @@ model = Sequential([
 
 model.compile(loss='mae', optimizer='adam', metrics=['accuracy'])
 
-model.fit(xTrain, yTrain, validation_data=(xValidation, yValidation), batch_size=32, shuffle=True, verbose=1, epochs=70)
+model.fit(xTrain, yTrain, validation_data=(xValidation, yValidation), batch_size=32, shuffle=True, verbose=1, epochs=30)
 
 scores = model.evaluate(xTrain, yTrain)
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
