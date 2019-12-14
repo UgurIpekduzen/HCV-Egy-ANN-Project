@@ -5,6 +5,24 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 from keras.utils.np_utils import to_categorical
 
+"""
+    # Algorithm
+        * Backpropagation (in fit)
+    # Activation Functions
+        -> ReLu
+        -> Tanh
+        -> Sigmoid
+    # Loss = Mean Absolute Error
+    # Optimizer = Adam (Adaptive Momentum)
+        - Learning Rate: 0.001
+        - Beta 1: 0.9
+        - Beta 2: 0.999
+    # Metrics = Accuracy
+    # Batch Size = 64
+        / Artması, daha doğru gradyen değerinin hesaplanmasını sağlıyor.
+        / Bu durum da linerizasyonu azaltıyor.
+"""
+
 
 trainDataset = np.loadtxt("./input/HCV-Egy-Data-ANN-Train.csv", delimiter=",")
 testDataset = np.loadtxt("./input/HCV-Egy-Data-ANN-Test.csv", delimiter=",")
@@ -21,6 +39,7 @@ yTest = testDataset[:len(testDataset), 28:29]
 
 # Sınıf değerlerinin binary değerlere çevrilmesi
 encoder = LabelEncoder()
+
 encoder.fit(yTrain)
 yTrain = encoder.transform(yTrain)
 yTrain = to_categorical(yTrain)
@@ -28,10 +47,6 @@ yTrain = to_categorical(yTrain)
 encoder.fit(yValidation)
 yValidation = encoder.transform(yValidation)
 yValidation = to_categorical(yValidation)
-
-# encoder.fit(yTest)
-# yTest = encoder.transform(yTest)
-# yTest = to_categorical(yTest)
 
 model = Sequential([
     Dense(16, activation="relu", input_dim=28),
@@ -41,10 +56,10 @@ model = Sequential([
 
 model.compile(loss='mae', optimizer='adam', metrics=['accuracy'])
 
-model.fit(xTrain, yTrain, validation_data=(xValidation, yValidation), batch_size=32, shuffle=True, verbose=1, epochs=30)
+model.fit(xTrain, yTrain, validation_data=(xValidation, yValidation), batch_size=128, shuffle=True, verbose=1, epochs=1024)
 
 scores = model.evaluate(xTrain, yTrain)
-print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
 # Tahmin sonuçlarının decimal hale çevrilmesi
 binaryPredictions = model.predict(xTest)
