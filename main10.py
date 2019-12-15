@@ -4,6 +4,8 @@ from sklearn.preprocessing import LabelEncoder
 from keras.utils.np_utils import to_categorical
 from sklearn import  model_selection
 from keras.optimizers import *
+from keras.losses import *
+from keras.metrics import *
 from sklearn.utils import shuffle
 from termcolor import cprint
 from sklearn.metrics import plot_roc_curve
@@ -16,9 +18,9 @@ print(dataset)
 
 data = shuffle(dataset)
 
-X = data.drop(['Baseline_Histological_Staging'], axis=1)
+X = dataset.drop(['Baseline_Histological_Staging'], axis=1)
 X = np.array(X)
-Y = data['Baseline_Histological_Staging']
+Y = dataset['Baseline_Histological_Staging']
 stageNumbers = findRepeatedElements(Y)
 stageNames = setStageNames(sorted(stageNumbers))
 nClasses = len(stageNames)
@@ -36,23 +38,15 @@ trainX, testX, trainY, testY = model_selection.train_test_split(X, Y,test_size =
 
 model = Sequential()
 
-model.add(Dense(100, activation="relu", input_dim=28))
-model.add(Dense(100, activation="tanh"))
-model.add(Dense(100, activation="tanh"))
-model.add(Dense(100, activation="tanh"))
-model.add(Dense(4, activation="softmax"))
+model.add(Dense(160, activation="tanh", input_dim=28))
+# model.add(Dense(100, activation="tanh"))
+# model.add(Dense(100, activation="tanh"))
+# model.add(Dense(100, activation="tanh"))
+model.add(Dense(4, activation="sigmoid"))
 
-model.compile(loss='categorical_crossentropy', optimizer=RMSprop(learning_rate=0.01,rho=0.9), metrics=['accuracy'])
-model.fit(trainX, trainY, batch_size=1000, shuffle=True, verbose=1, epochs=10000)
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001, rho=0.9), metrics=[mse,categorical_accuracy])
+model.fit(trainX, trainY, batch_size=64, verbose=1, epochs=6000)
 scores = model.evaluate(trainX, trainY)
-# falsePosRate = dict()
-# truePosRate = dict()
-# rocAuc = dict()
-# for i in range(nClasses):
-#     falsePosRate[i], truePosRate[i], _ = roc_curve(y[:, i], y_score[:, i])
-#     roc_auc[i] = auc(falsePosRate[i], tpr[i])
-# disp = plot_roc_curve(model, testX, testY)
-# plt.show()
 
 
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
@@ -65,7 +59,7 @@ targets = np.argmax(testY, axis=1) + 1
 plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
                 classes=stageNames
                 ,normalize=False)
-
+# plot_roc(train_x=trainX, train_y=trainY, test_x=testX, test_y=testY, n_classes=nClasses)
 # predictionsIndexes = np.argmax(binaryPredictions, axis=1)
 # decimalPredictions = predictionsIndexes + 1
 #

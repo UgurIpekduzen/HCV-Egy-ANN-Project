@@ -3,7 +3,8 @@ from matplotlib import pyplot
 from pandas import DataFrame
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LogisticRegression
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix, precision_recall_curve, auc, f1_score, roc_curve
 from dataset import *
 from sklearn.metrics import plot_confusion_matrix
@@ -137,5 +138,28 @@ def findRepeatedElements(x):
     return repeated
 
 
-def plot_roc(trainX, trainY, testX, testY):
-    fpr2, tpr2, threshold = roc_curve(testY, plt.clf.predict_proba()[:, 1])
+def plot_roc(train_x, train_y, test_x, test_y, n_classes):
+    # classifier
+    clf = OneVsRestClassifier(LinearSVC(random_state=0))
+    y_score = clf.fit(train_x, train_y).decision_function(test_x)
+
+    # Compute ROC curve and ROC area for each class
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve( test_y[:, i], y_score[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    # Plot of a ROC curve for a specific class
+    for i in range(n_classes):
+        plt.figure()
+        plt.plot(fpr[i], tpr[i], label='ROC curve (area = %0.2f)' % roc_auc[i])
+        plt.plot([0, 1], [0, 1], 'k--')
+        plt.xlim([0.0, 1.0])
+        plt.ylim([0.0, 1.05])
+        plt.xlabel('False Positive Rate')
+        plt.ylabel('True Positive Rate')
+        plt.title('Receiver operating characteristic example')
+        plt.legend(loc="lower right")
+        plt.show()
