@@ -2,12 +2,11 @@ from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.preprocessing import LabelEncoder
 from keras.utils.np_utils import to_categorical
-from sklearn import  model_selection
+from sklearn import model_selection
 from keras.optimizers import *
 from sklearn.utils import shuffle
 from termcolor import cprint
 from sklearn.metrics import plot_roc_curve
-
 
 from dataset import *
 
@@ -17,8 +16,9 @@ print(dataset)
 data = shuffle(dataset)
 
 X = data.drop(['Baseline_Histological_Staging'], axis=1)
-X = np.array(X)
 Y = data['Baseline_Histological_Staging']
+
+print("Tekrar eden çıkışlar tespit ediliyor...")
 stageNumbers = findRepeatedElements(Y)
 stageNames = setStageNames(sorted(stageNumbers))
 nClasses = len(stageNames)
@@ -28,30 +28,27 @@ encoder.fit(Y)
 Y = encoder.transform(Y)
 Y = to_categorical(Y)
 
-trainX, testX, trainY, testY = model_selection.train_test_split(X, Y,test_size = 0.231, random_state = 0)
+trainX, testX, trainY, testY = model_selection.train_test_split(X, Y, test_size=0.231, random_state=0)
 
-model = Sequential()
+model = Sequential([
+    Dense(100, activation="relu", input_dim=28),
+    Dense(100, activation="tanh"),
+    Dense(100, activation="tanh"),
+    Dense(100, activation="tanh"),
+    Dense(4, activation="sigmoid")
+])
 
-model.add(Dense(16, activation="relu", input_dim=28))
-model.add(Dense(100, activation="tanh"))
-model.add(Dense(4, activation="sigmoid"))
-
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(trainX, trainY, batch_size=128, shuffle=True, verbose=1, epochs=70)
+model.compile(loss='mse', optimizer=RMSprop(learning_rate=0.01, rho=0.9), metrics=['accuracy'])
+model.fit(trainX, trainY, batch_size=1024, shuffle=True, verbose=1, epochs=10000)
 scores = model.evaluate(trainX, trainY)
 
-print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
 # Tahmin sonuçlarının decimal hale çevrilmesi
 predictions = model.predict(testX)
 predictions = np.argmax(predictions, axis=1) + 1
 
-# Confusion Matrix
-# targets = np.argmax(testY, axis=1) + 1
-# plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
-#                 classes=stageNames
-#                 ,normalize=False)
-plot_roc(trainX, trainY, testX, testY)
+targets = np.argmax(testY, axis=1) + 1
 
 dogru = 0
 yanlis = 0
@@ -68,3 +65,7 @@ for x, y in zip(predictions, targets):
 print("\n", "-" * 150, "\nISTATISTIK:\nToplam ", toplam_veri, " Veri içersinde;\nDoğru Bilme Sayısı: ", dogru,
       "\nYanlış Bilme Sayısı: ", yanlis,
       "\nBaşarı Yüzdesi: ", str(int(100 * dogru / toplam_veri)) + "%", sep="")
+
+plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
+                classes=stageNames
+                , normalize=False)

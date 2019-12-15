@@ -88,10 +88,7 @@ def setStageNames(stages):
     return stageNames
 
 def plot_cnf_matrix(target, predicted, classes, normalize=False):
-    """
-    This function prints and plots the confusion matrix.
-    Normalization can be applied by setting `normalize=True`.
-    """
+    print("Confusion Matrix hazırlanıyor...")
     title = ""
     titleOptions = ["Confusion Matrix with Normalization", "Confusion Matrix without Normalization"]
     plt.figure()
