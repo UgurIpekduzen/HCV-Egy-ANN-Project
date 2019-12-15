@@ -1,8 +1,10 @@
 import numpy as np
+from matplotlib import pyplot
 from pandas import DataFrame
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.metrics import confusion_matrix
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix, precision_recall_curve, auc, f1_score, roc_curve
 from dataset import *
 from sklearn.metrics import plot_confusion_matrix
 import itertools
@@ -66,6 +68,7 @@ def plot_corr(df):
     plt.show()
     print("Çizildi")
 
+
 def setStageNames(stages):
     stageNames = []
 
@@ -125,6 +128,7 @@ def plot_cnf_matrix(target, predicted, classes, normalize=False):
     plt.tight_layout()
     plt.show()
 
+
 def findRepeatedElements(x):
     _size = len(x)
     repeated = []
@@ -136,4 +140,5 @@ def findRepeatedElements(x):
     return repeated
 
 
-
+def plot_roc(trainX, trainY, testX, testY):
+    fpr2, tpr2, threshold = roc_curve(testY, plt.clf.predict_proba()[:, 1])
