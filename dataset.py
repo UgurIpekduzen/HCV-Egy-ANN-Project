@@ -2,6 +2,10 @@ import numpy as np
 from pandas import DataFrame
 import seaborn as sns
 import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+from dataset import *
+from sklearn.metrics import plot_confusion_matrix
+import itertools
 
 def parseRowsAndColumns():
     rawData = np.loadtxt('./input/HCV-Egy-Data.csv', delimiter=",")
@@ -12,7 +16,6 @@ def parseRowsAndColumns():
             column.append(rawData[i][j])
         splittedData.append(column)
     return splittedData
-
 
 def setDataFrame():
     dataColumns = parseRowsAndColumns()
@@ -63,6 +66,64 @@ def plot_corr(df):
     plt.show()
     print("Çizildi")
 
+def setStageNames(stages):
+    stageNames = []
+
+    for item in stages:
+        stageName = ""
+        if item == 1:
+            stageName = "F1"
+        elif item == 2:
+            stageName = "F2"
+        elif item == 3:
+            stageName = "F3"
+        elif item == 4:
+            stageName = "F4"
+        else:
+            stageName = "F0"
+        stageNames.append(stageName)
+    return stageNames
+
+def plot_cnf_matrix(target, predicted, classes, normalize=False):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    title = ""
+    titleOptions = ["Confusion Matrix with Normalization", "Confusion Matrix without Normalization"]
+    plt.figure()
+    cnfMatrix = confusion_matrix(y_true=target, y_pred=predicted, labels=classes)
+    np.set_printoptions(precision=2)
+    cmap = plt.cm.Blues
+
+
+    if normalize:
+        cnfMatrix = cnfMatrix.astype('float') / cnfMatrix.sum(axis=1)[:, np.newaxis]
+        title = titleOptions[0]
+    else:
+        title = titleOptions[1]
+    print(title)
+
+    print(cnfMatrix)
+
+    plt.imshow(cnfMatrix, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cnfMatrix.max() / 2.
+    for i, j in itertools.product(range(cnfMatrix.shape[0]), range(cnfMatrix.shape[1])):
+        plt.text(j, i, format(cnfMatrix[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cnfMatrix[i, j] > thresh else "black")
+
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
+    plt.tight_layout()
+    plt.show()
 
 def findRepeatedElements(x):
     _size = len(x)
