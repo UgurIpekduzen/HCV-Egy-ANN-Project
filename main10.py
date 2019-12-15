@@ -36,14 +36,14 @@ trainX, testX, trainY, testY = model_selection.train_test_split(X, Y,test_size =
 
 model = Sequential()
 
-model.add(Dense(16, activation="relu", input_dim=28))
+model.add(Dense(100, activation="relu", input_dim=28))
 model.add(Dense(100, activation="tanh"))
-# model.add(Dense(33, activation="relu"))
-# model.add(Dense(33, activation="relu"))
-model.add(Dense(4, activation="sigmoid"))
+model.add(Dense(100, activation="tanh"))
+model.add(Dense(100, activation="tanh"))
+model.add(Dense(4, activation="softmax"))
 
-model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
-model.fit(trainX, trainY, batch_size=128, shuffle=True, verbose=1, epochs=70)
+model.compile(loss='categorical_crossentropy', optimizer=RMSprop(learning_rate=0.01,rho=0.9), metrics=['accuracy'])
+model.fit(trainX, trainY, batch_size=1000, shuffle=True, verbose=1, epochs=10000)
 scores = model.evaluate(trainX, trainY)
 # falsePosRate = dict()
 # truePosRate = dict()
