@@ -11,11 +11,10 @@ from sklearn.metrics import plot_roc_curve
 from dataset import *
 
 dataset = setDataFrame()
-print(dataset)
-
 data = shuffle(dataset)
 
 X = data.drop(['Baseline_Histological_Staging'], axis=1)
+X = np.array(X)
 Y = data['Baseline_Histological_Staging']
 
 print("Tekrar eden çıkışlar tespit ediliyor...")
@@ -38,7 +37,7 @@ model = Sequential([
     Dense(4, activation="sigmoid")
 ])
 
-model.compile(loss='mse', optimizer=RMSprop(learning_rate=0.01, rho=0.9), metrics=['accuracy'])
+model.compile(loss='mse', optimizer=RMSprop(learning_rate=0.001, rho=0.90), metrics=['accuracy'])
 model.fit(trainX, trainY, batch_size=1024, shuffle=True, verbose=1, epochs=10000)
 scores = model.evaluate(trainX, trainY)
 
