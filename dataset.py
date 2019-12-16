@@ -6,7 +6,6 @@ import matplotlib.pyplot as plt
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.svm import LinearSVC
 from sklearn.metrics import confusion_matrix, auc, roc_curve
-from dataset import *
 import itertools
 
 def parseRowsAndColumns():
