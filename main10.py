@@ -2,16 +2,13 @@ from keras.models import Sequential
 from keras.layers import Dense
 from sklearn.preprocessing import LabelEncoder
 from keras.utils.np_utils import to_categorical
-from sklearn import  model_selection
+from sklearn import model_selection
 from keras.optimizers import *
-from keras.losses import *
 from keras.metrics import *
 from sklearn.utils import shuffle
 from termcolor import cprint
-from sklearn.metrics import plot_roc_curve
-
-
 from dataset import *
+
 
 dataset = setDataFrame()
 print(dataset)
@@ -59,6 +56,7 @@ targets = np.argmax(testY, axis=1) + 1
 confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
                 classes=stageNames
                 ,normalize=False)
+
 plot_roc(X_train=trainX, X_test=testX, Y_train= trainY, Y_test=testY, stage_names=stageNames)
 # predictionsIndexes = np.argmax(binaryPredictions, axis=1)
 # decimalPredictions = predictionsIndexes + 1
