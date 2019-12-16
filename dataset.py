@@ -138,17 +138,18 @@ def findRepeatedElements(x):
     return repeated
 
 
-def plot_roc(train_x, train_y, test_x, test_y, n_classes):
-    # classifier
+def plot_roc(X_train, X_test, Y_train, Y_test, stage_names):
+    n_classes = len(stage_names)
+
     clf = OneVsRestClassifier(LinearSVC(random_state=0))
-    y_score = clf.fit(train_x, train_y).decision_function(test_x)
+    y_score = clf.fit(X_train, Y_train).decision_function(X_test)
 
     # Compute ROC curve and ROC area for each class
     fpr = dict()
     tpr = dict()
     roc_auc = dict()
     for i in range(n_classes):
-        fpr[i], tpr[i], _ = roc_curve( test_y[:, i], y_score[:, i])
+        fpr[i], tpr[i], _ = roc_curve(Y_test[:, i], y_score[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
 
     # Plot of a ROC curve for a specific class
@@ -160,6 +161,44 @@ def plot_roc(train_x, train_y, test_x, test_y, n_classes):
         plt.ylim([0.0, 1.05])
         plt.xlabel('False Positive Rate')
         plt.ylabel('True Positive Rate')
-        plt.title('Receiver operating characteristic example')
+        plt.title('Receiver Operating Characteristic for ' + stage_names[i])
         plt.legend(loc="lower right")
         plt.show()
+
+
+# # roc curve and auc
+# from sklearn.datasets import make_classification
+# from sklearn.linear_model import LogisticRegression
+# from sklearn.model_selection import train_test_split
+# from sklearn.metrics import roc_curve
+# from sklearn.metrics import roc_auc_score
+# from matplotlib import pyplot
+# # generate 2 class dataset
+# X, y = make_classification(n_samples=1000, n_classes=2, random_state=1)
+# # split into train/test sets
+# trainX, testX, trainy, testy = train_test_split(X, y, test_size=0.5, random_state=2)
+# # generate a no skill prediction (majority class)
+# ns_probs = [0 for _ in range(len(testy))]
+# # fit a model
+# model.fit(trainX, trainy)
+# # predict probabilities
+# lr_probs = model.predict_proba(testX)
+# # keep probabilities for the positive outcome only
+# lr_probs = lr_probs[:, 1]
+# # calculate scores
+# ns_auc = roc_auc_score(testy, ns_probs)
+# # summarize scores
+# print('No Skill: ROC AUC=%.3f' % (ns_auc))
+#
+# # calculate roc curves
+# ns_fpr, ns_tpr, _ = roc_curve(testy, ns_probs)
+#
+# # plot the roc curve for the model
+# pyplot.plot(ns_fpr, ns_tpr, linestyle='--', label='No Skill')
+# # axis labels
+# pyplot.xlabel('False Positive Rate')
+# pyplot.ylabel('True Positive Rate')
+# # show the legend
+# pyplot.legend()
+# # show the plot
+# pyplot.show()

@@ -23,7 +23,7 @@ X = np.array(X)
 Y = dataset['Baseline_Histological_Staging']
 stageNumbers = findRepeatedElements(Y)
 stageNames = setStageNames(sorted(stageNumbers))
-nClasses = len(stageNames)
+
 
 encoder = LabelEncoder()
 encoder.fit(Y)
@@ -45,7 +45,7 @@ model.add(Dense(160, activation="tanh", input_dim=28))
 model.add(Dense(4, activation="sigmoid"))
 
 model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001, rho=0.9), metrics=[mse,categorical_accuracy])
-model.fit(trainX, trainY, batch_size=64, verbose=1, epochs=6000)
+model.fit(trainX, trainY, batch_size=64, verbose=1, epochs=70)
 scores = model.evaluate(trainX, trainY)
 
 
@@ -56,10 +56,10 @@ predictions = model.predict(testX)
 predictions = np.argmax(predictions, axis=1) + 1
 
 targets = np.argmax(testY, axis=1) + 1
-plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
+confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
                 classes=stageNames
                 ,normalize=False)
-# plot_roc(train_x=trainX, train_y=trainY, test_x=testX, test_y=testY, n_classes=nClasses)
+plot_roc(X_train=trainX, X_test=testX, Y_train= trainY, Y_test=testY, stage_names=stageNames)
 # predictionsIndexes = np.argmax(binaryPredictions, axis=1)
 # decimalPredictions = predictionsIndexes + 1
 #
