@@ -49,15 +49,16 @@ scores = model.evaluate(trainX, trainY)
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
 # Tahmin sonuçlarının decimal hale çevrilmesi
-predictions = model.predict(testX)
-predictions = np.argmax(predictions, axis=1) + 1
+binaryPredictions = model.predict(testX)
+predictions = np.argmax(binaryPredictions, axis=1) + 1
 
 targets = np.argmax(testY, axis=1) + 1
 confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
                 classes=stageNames
                 ,normalize=False)
 
-plot_roc(X_train=trainX, X_test=testX, Y_train= trainY, Y_test=testY, stage_names=stageNames)
+# plot_roc(X_train=trainX, X_test=testX, Y_train= trainY, Y_test=testY, stage_names=stageNames)
+plot_roc2(Y_test=testY, predictions=binaryPredictions, stage_names=stageNames)
 # predictionsIndexes = np.argmax(binaryPredictions, axis=1)
 # decimalPredictions = predictionsIndexes + 1
 #

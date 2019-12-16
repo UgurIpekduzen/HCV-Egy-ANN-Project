@@ -168,4 +168,30 @@ def plot_roc(X_train, X_test, Y_train, Y_test, stage_names):
     print("ROC Curve is completed")
 
 
+def plot_roc2(Y_test, predictions, stage_names):
+    n_classes = len(stage_names)
+
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(Y_test[:, i], predictions[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    plt.figure()
+
+    for i in range(n_classes):
+        plt.plot(fpr[i], tpr[i], label='ROC curve of ' + stage_names[i] + ' (AUC = %0.2f)' % roc_auc[i])
+
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
+
+    print("ROC Curve is completed")
+
 
