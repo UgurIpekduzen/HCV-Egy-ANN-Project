@@ -3,10 +3,10 @@ from matplotlib import pyplot
 from pandas import DataFrame
 import seaborn as sns
 import matplotlib.pyplot as plt
-from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import confusion_matrix, precision_recall_curve, auc, f1_score, roc_curve
+from sklearn.multiclass import OneVsRestClassifier
+from sklearn.svm import LinearSVC
+from sklearn.metrics import confusion_matrix, auc, roc_curve
 from dataset import *
-from sklearn.metrics import plot_confusion_matrix
 import itertools
 
 def parseRowsAndColumns():
@@ -64,9 +64,10 @@ def plot_corr(df):
     cmap = sns.diverging_palette(220, 10, as_cmap=True)
     sns.heatmap(df.corr(), cmap=cmap, vmax=1.0, vmin=-1.0, center=0,
                 square=True, linewidths=.5, cbar_kws={"shrink": .5})
-    plt.title('Korelasyon Matrisi')
+    plt.title('Correlation Matrix')
     plt.show()
-    print("Çizildi")
+
+    print("Correlation Matrix is completed")
 
 
 def setStageNames(stages):
@@ -88,7 +89,6 @@ def setStageNames(stages):
     return stageNames
 
 def plot_cnf_matrix(target, predicted, classes, normalize=False):
-    print("Confusion Matrix hazırlanıyor...")
     title = ""
     titleOptions = ["Confusion Matrix with Normalization", "Confusion Matrix without Normalization"]
     plt.figure()
@@ -125,6 +125,8 @@ def plot_cnf_matrix(target, predicted, classes, normalize=False):
     plt.tight_layout()
     plt.show()
 
+    print("Confusion Matrix is completed")
+
 
 def findRepeatedElements(x):
     _size = len(x)
@@ -136,6 +138,60 @@ def findRepeatedElements(x):
                 repeated.append(x[i])
     return repeated
 
+def plot_roc(X_train, X_test, Y_train, Y_test, stage_names):
+    n_classes = len(stage_names)
 
-def plot_roc(trainX, trainY, testX, testY):
-    fpr2, tpr2, threshold = roc_curve(testY, plt.clf.predict_proba()[:, 1])
+    clf = OneVsRestClassifier(LinearSVC(random_state=0))
+    y_score = clf.fit(X_train, Y_train).decision_function(X_test)
+
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(Y_test[:, i], y_score[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    plt.figure()
+
+    for i in range(n_classes):
+        plt.plot(fpr[i], tpr[i], label='ROC curve of ' + stage_names[i] + ' (AUC = %0.2f)' % roc_auc[i])
+
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
+
+    print("ROC Curve is completed")
+
+
+def plot_roc2(Y_test, predictions, stage_names):
+    n_classes = len(stage_names)
+
+    fpr = dict()
+    tpr = dict()
+    roc_auc = dict()
+    for i in range(n_classes):
+        fpr[i], tpr[i], _ = roc_curve(Y_test[:, i], predictions[:, i])
+        roc_auc[i] = auc(fpr[i], tpr[i])
+
+    plt.figure()
+
+    for i in range(n_classes):
+        plt.plot(fpr[i], tpr[i], label='ROC curve of ' + stage_names[i] + ' (AUC = %0.2f)' % roc_auc[i])
+
+    plt.plot([0, 1], [0, 1], 'k--')
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('Receiver Operating Characteristic')
+    plt.legend(loc="lower right")
+    plt.show()
+
+    print("ROC Curve is completed")
+
+
