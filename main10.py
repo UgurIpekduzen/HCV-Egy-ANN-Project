@@ -11,6 +11,7 @@ from dataset import *
 
 
 # Veri setinin hazırlanması
+epochValue = 10000
 dataset = setDataFrame()
 data = shuffle(dataset)
 
@@ -35,7 +36,7 @@ Y = to_categorical(Y)
 # Y2 = to_categorical(Y2)
 
 # Veri setinin kümelere ayrılması.
-trainX, testX, trainY, testY = model_selection.train_test_split(X, Y, test_size=0.231, random_state=0)
+trainX, testX, trainY, testY = model_selection.train_test_split(X, Y, test_size=0.15, random_state=0)
 
 # Modelin katmanlara ayrılması
 model = Sequential([
@@ -47,9 +48,9 @@ model = Sequential([
 ])
 
 # model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001), metrics=[mse, categorical_accuracy])
-model.compile(loss='mse', optimizer=RMSprop(lr=0.0001), metrics=['accuracy'])
+model.compile(loss='mse', optimizer=RMSprop(lr=0.001), metrics=['accuracy'])
 
-model.fit(trainX, trainY, batch_size=64, verbose=1, epochs=100)
+history = model.fit(trainX, trainY, batch_size=1024,validation_split=0.15, verbose=1, epochs=epochValue)
 scores = model.evaluate(trainX, trainY)
 
 # Accuracy sonucunun ekrana basılması
@@ -85,6 +86,7 @@ print("\n", "-" * 150, "\nISTATISTIK:\nToplam ", toplam_veri, " Veri içersinde;
       "\nYanlış Bilme Sayısı: ", yanlis,
       "\nBaşarı Yüzdesi: ", str(int(100 * dogru / toplam_veri)) + "%", sep="")
 
+plot_corr(dataset)
 # Confusion Matrix'in hazırlanması ve çizdirilmesi
 confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
                                   classes=stageNames
@@ -93,3 +95,4 @@ confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=s
 # ROC Curve grafiğinin hazırlanması ve çizdirilmesi
 # plot_roc(X_train=trainX, X_test=testX, Y_train= trainY, Y_test=testY, stage_names=stageNames)
 plot_roc2(Y_test=testY, predictions=binaryPredictions, stage_names=stageNames)
+plot_train_and_val_loss(history=history, epoch=epochValue)

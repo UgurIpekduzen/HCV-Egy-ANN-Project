@@ -194,3 +194,16 @@ def plot_roc2(Y_test, predictions, stage_names):
     print("ROC Curve is completed")
 
 
+def plot_train_and_val_loss(history, epoch):
+    plt.figure()
+    epochs = range(1, epoch + 1)
+    loss = history.history['loss']
+    valLoss = history.history['val_loss']
+
+    plt.plot(epochs, loss, 'bo', label='Train Loss', color='red')
+    plt.plot(epochs, valLoss, 'b', label='Validation Loss', color='blue')
+    plt.title('Train and Validation Loss')
+    plt.xlabel('Epochs')
+    plt.ylabel('Losses')
+    plt.legend()
+    plt.show()
