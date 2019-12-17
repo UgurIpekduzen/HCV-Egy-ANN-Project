@@ -1,7 +1,6 @@
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import *
-from keras.metrics import *
 from keras.utils.np_utils import to_categorical
 from sklearn import model_selection
 from sklearn.preprocessing import LabelEncoder
@@ -13,27 +12,24 @@ from dataset import *
 # Veri setinin hazırlanması
 epochValue = 10000
 dataset = setDataFrame()
-data = shuffle(dataset)
+plot_corr(dataset)
+dataset = shuffle(dataset)
 
 # Veri setinin giriş ve çıkışlara ayrılması
-X = dataset.drop(['Baseline_Histological_Staging'], axis=1)
+X = dataset.drop(['BHS'], axis=1)
 X = np.array(X)
-Y = dataset['Baseline_Histological_Staging']
+Y = dataset['BHS']
 
 # Tekrar eden çıkışların tespit edilmesi ve çıkış sıralarına göre sıralanması
 print("\nRepeating outputs are analyzing...\n")
 stageNumbers = findRepeatedElements(Y)
 stageNames = setStageNames(sorted(stageNumbers))
 
-# TODO: Yorum satırı eklenecek
+# Hastalık seviyelerinin binary formata çevrilmesi
 encoder = LabelEncoder()
 encoder.fit(Y)
 Y = encoder.transform(Y)
 Y = to_categorical(Y)
-
-# encoder.fit(Y2)
-# Y2 = encoder.transform(Y2)
-# Y2 = to_categorical(Y2)
 
 # Veri setinin kümelere ayrılması.
 trainX, testX, trainY, testY = model_selection.train_test_split(X, Y, test_size=0.15, random_state=0)
@@ -56,17 +52,11 @@ scores = model.evaluate(trainX, trainY)
 # Accuracy sonucunun ekrana basılması
 print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 
-# TODO: Tahmin sonuçlarının decimal hale çevrilmesi
+# Tahmin sonuçlarının decimal hale çevrilmesi
 binaryPredictions = model.predict(testX)
 predictions = np.argmax(binaryPredictions, axis=1) + 1
 
 targets = np.argmax(testY, axis=1) + 1
-
-# predictionsIndexes = np.argmax(binaryPredictions, axis=1)
-# decimalPredictions = predictionsIndexes + 1
-#
-# targetIndexes = np.argmax(testY, axis=1) + 1
-# decimalTargets = targetIndexes + 1
 
 dogru = 0
 yanlis = 0
@@ -86,13 +76,16 @@ print("\n", "-" * 150, "\nISTATISTIK:\nToplam ", toplam_veri, " Veri içersinde;
       "\nYanlış Bilme Sayısı: ", yanlis,
       "\nBaşarı Yüzdesi: ", str(int(100 * dogru / toplam_veri)) + "%", sep="")
 
-plot_corr(dataset)
+
 # Confusion Matrix'in hazırlanması ve çizdirilmesi
 confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
-                                  classes=stageNames
-                                  , normalize=False)
+                                  stages=stageNames
+                                  , normalize=True)
 
 # ROC Curve grafiğinin hazırlanması ve çizdirilmesi
+
 # plot_roc(X_train=trainX, X_test=testX, Y_train= trainY, Y_test=testY, stage_names=stageNames)
 plot_roc2(Y_test=testY, predictions=binaryPredictions, stage_names=stageNames)
+
+#Eğitim ve doğrulama hatalarının grafiğinin hazırlanması ve çizdirilmesi
 plot_train_and_val_loss(history=history, epoch=epochValue)

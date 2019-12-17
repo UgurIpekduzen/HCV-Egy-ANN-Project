@@ -66,5 +66,5 @@ print("\n", "-" * 150, "\nISTATISTIK:\nToplam ", toplam_veri, " Veri içersinde;
       "\nBaşarı Yüzdesi: ", str(int(100 * dogru / toplam_veri)) + "%", sep="")
 
 plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
-                classes=stageNames
+                stages=stageNames
                 , normalize=False)
