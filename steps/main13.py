@@ -1,16 +1,18 @@
 from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import *
-from keras.utils.np_utils import to_categorical
-from sklearn import model_selection
+from keras.utils import normalize, to_categorical
+from sklearn import model_selection, preprocessing
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import shuffle
 from termcolor import cprint
 from dataset import *
+import pandas as pd
 
 #  Veri setinin hazırlanması
-epochValue = 10000
+epochValue = 1000
 dataset = setDataFrame()
+
 # plot_corr(dataset)
 dataset = shuffle(dataset)
 
@@ -33,9 +35,14 @@ Y = to_categorical(Y)
 # Veri setinin kümelere ayrılması.
 trainX, testX, trainY, testY = model_selection.train_test_split(X, Y, test_size=0.15, random_state=0)
 
+trainX = normalize(trainX, axis=1)
+testX = normalize(testX, axis=1)
+trainY = to_categorical(trainY)
+testY = to_categorical(testY)
+
 # Modelin katmanlara ayrılması
 model = Sequential([
-    Dense(32, activation="sigmoid", input_dim=28),
+    Dense(32, activation="tanh", input_dim=28),
     Dense(4, activation="sigmoid")
 ])
 
