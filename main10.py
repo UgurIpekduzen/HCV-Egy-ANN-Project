@@ -8,7 +8,6 @@ from sklearn.utils import shuffle
 from termcolor import cprint
 from dataset import *
 
-
 # Veri setinin hazırlanması
 epochValue = 10000
 dataset = setDataFrame()
@@ -20,7 +19,7 @@ X = dataset.drop(['BHS'], axis=1)
 X = np.array(X)
 Y = dataset['BHS']
 
-# Tekrar eden çıkışların tespit edilmesi ve çıkış sıralarına göre sıralanması
+# Veri setinindeki çıkışların isimlendirilmesi
 print("\nRepeating outputs are analyzing...\n")
 stageNumbers = findRepeatedElements(Y)
 stageNames = setStageNames(sorted(stageNumbers))
@@ -43,9 +42,9 @@ model = Sequential([
     Dense(4, activation="sigmoid")
 ])
 
-# model.compile(loss='categorical_crossentropy', optimizer=RMSprop(lr=0.0001), metrics=[mse, categorical_accuracy])
 model.compile(loss='mse', optimizer=RMSprop(lr=0.001), metrics=['accuracy'])
 
+# Modelin eğitilmesi ve train accuracy'nin ekrana basılması
 history = model.fit(trainX, trainY, batch_size=1024,validation_split=0.15, verbose=1, epochs=epochValue)
 scores = model.evaluate(trainX, trainY)
 
@@ -55,7 +54,6 @@ print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1] * 100))
 # Tahmin sonuçlarının decimal hale çevrilmesi
 binaryPredictions = model.predict(testX)
 predictions = np.argmax(binaryPredictions, axis=1) + 1
-
 targets = np.argmax(testY, axis=1) + 1
 
 dogru = 0
@@ -80,7 +78,7 @@ print("\n", "-" * 150, "\nISTATISTIK:\nToplam ", toplam_veri, " Veri içersinde;
 # Confusion Matrix'in hazırlanması ve çizdirilmesi
 confusionMatrix = plot_cnf_matrix(predicted=setStageNames(predictions), target=setStageNames(targets),
                                   stages=stageNames
-                                  , normalize=True)
+                                  , normalize=False)
 
 # ROC Curve grafiğinin hazırlanması ve çizdirilmesi
 

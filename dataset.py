@@ -109,7 +109,7 @@ def plot_cnf_matrix(target, predicted, stages, normalize=False):
     np.set_printoptions(precision=2)
     cmap = plt.cm.Blues
 
-    #Boolean değerine göre değerleri normalize eder
+    # Boolean değerine göre değerleri normalize eder
     if normalize:
         cnfMatrix = cnfMatrix.astype('float') / cnfMatrix.sum(axis=1)[:, np.newaxis]
         title = titleOptions[0]
