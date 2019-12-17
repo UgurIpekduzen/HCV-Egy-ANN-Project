@@ -2,21 +2,28 @@ from keras.models import Sequential
 from keras.layers import Dense
 from keras.optimizers import *
 from keras.utils.np_utils import to_categorical
-from sklearn import model_selection
+from sklearn import model_selection, preprocessing
 from sklearn.preprocessing import LabelEncoder
 from sklearn.utils import shuffle
 from termcolor import cprint
 from dataset import *
+import pandas as pd
 
 #  Veri setinin hazırlanması
-epochValue = 10000
+epochValue = 1000
 dataset = setDataFrame()
+
 # plot_corr(dataset)
 dataset = shuffle(dataset)
 
 # Veri setinin giriş ve çıkışlara ayrılması
 X = dataset.drop(['BHS'], axis=1)
 X = np.array(X)
+tf.keras.utils.normalize(
+    X,
+    axis=-1,
+    order=2
+)
 Y = dataset['BHS']
 
 # Veri setinindeki çıkışların isimlendirilmesi
@@ -35,7 +42,7 @@ trainX, testX, trainY, testY = model_selection.train_test_split(X, Y, test_size=
 
 # Modelin katmanlara ayrılması
 model = Sequential([
-    Dense(32, activation="sigmoid", input_dim=28),
+    Dense(32, activation="tanh", input_dim=28),
     Dense(4, activation="sigmoid")
 ])
 
